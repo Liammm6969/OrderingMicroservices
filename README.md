@@ -118,5 +118,3 @@ Feel free to fork this repository and submit pull requests. For major changes, p
 MIT License © 2025 [Your Name]
 
 ---
-
-Want help adapting this for a specific tech stack (like Django, Flask, Spring Boot, etc.) or including Docker support? Let me know!
