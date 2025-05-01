@@ -53,8 +53,11 @@ const Navbar = () => {
       navigate('/profile');
     }
     console.log(isAuthenticated)
+  }
 
-
+  const handleLogout = () => {
+    logout({ returnTo: window.location.origin });
+    localStorage.removeItem('user');
   }
   return (
     <AppBar position="static" color="default" elevation={1}>
@@ -76,7 +79,7 @@ const Navbar = () => {
               textDecoration: 'none',
             }}
           >
-            PRODUCT CATALOG
+            Shopashoes
           </Typography>
 
 
@@ -184,8 +187,8 @@ const Navbar = () => {
               <MenuItem onClick={handleUserProfile}>
                 <Typography textAlign="center">Profile</Typography>
               </MenuItem>
-              <MenuItem onClick={handleUserProfile}>
-                <Typography textAlign="center" onClick={logout}>Logout</Typography>
+              <MenuItem onClick={handleLogout}>
+                <Typography textAlign="center" >Logout</Typography>
               </MenuItem>
 
             </Menu>
