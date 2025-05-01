@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { 
-  Search, 
-  Bell, 
-  ShoppingCart, 
-  ChevronDown, 
-  SlidersHorizontal 
+import {
+  Search,
+  Bell,
+  ShoppingCart,
+  ChevronDown,
+  SlidersHorizontal
 } from 'lucide-react';
 import '../styles/Home.css';
 import { useNavigate } from 'react-router-dom';
-
+import Navbar from '../pages/Navbar';
 const Home = () => {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [sortBy, setSortBy] = useState('Featured');
   const navigate = useNavigate();
-  
-  function info(){
+
+  function info() {
     navigate('/productinfo')
   }
   const toggleSortMenu = () => {
@@ -35,9 +35,9 @@ const Home = () => {
 
   return (
     <div className="app-container">
-        
+
       <header className="header">
-        <div className="header-content">
+        {/* <div className="header-content">
           <div className="header-actions">
             <button className="icon-button">
               <Search size={20} />
@@ -51,23 +51,24 @@ const Home = () => {
               className="avatar"
             />
           </div>
-        </div>
+        </div> */}
+        <Navbar />
       </header>
 
       <main className="main-content">
         <div className="products-header">
           <h1 className="page-title">Products</h1>
-          
+
           <div className="header-controls">
             <div className="dropdown-container">
-              <button 
+              <button
                 className="control-button"
                 onClick={toggleFilterMenu}
               >
                 <SlidersHorizontal size={16} className="button-icon" />
                 <span>Filters</span>
               </button>
-              
+
               {showFilterMenu && (
                 <div className="dropdown-menu">
                   <button className="dropdown-item">All</button>
@@ -77,37 +78,37 @@ const Home = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="dropdown-container">
-              <button 
+              <button
                 className="control-button"
                 onClick={toggleSortMenu}
               >
                 <span>Sort by: {sortBy}</span>
                 <ChevronDown size={16} className="button-icon" />
               </button>
-              
+
               {showSortMenu && (
                 <div className="dropdown-menu">
-                  <button 
+                  <button
                     className="dropdown-item"
                     onClick={() => handleSortSelect('Featured')}
                   >
                     Featured
                   </button>
-                  <button 
+                  <button
                     className="dropdown-item"
                     onClick={() => handleSortSelect('Price: Low to High')}
                   >
                     Price: Low to High
                   </button>
-                  <button 
+                  <button
                     className="dropdown-item"
                     onClick={() => handleSortSelect('Price: High to Low')}
                   >
                     Price: High to Low
                   </button>
-                  <button 
+                  <button
                     className="dropdown-item"
                     onClick={() => handleSortSelect('Newest')}
                   >
@@ -116,7 +117,6 @@ const Home = () => {
                 </div>
               )}
             </div>
-            
 
             <button className="cart-button">
               <ShoppingCart size={20} />
@@ -248,7 +248,7 @@ const Home = () => {
           <div className="product-card">
             <div className="product-image-container">
               <img
-               src="./src/pictures/8.png"
+                src="./src/pictures/8.png"
                 alt="Nike Cortez Leather"
                 className="product-image"
               />
