@@ -33,6 +33,23 @@ const Home = () => {
     setShowSortMenu(false);
   };
 
+  const getAllProducts = () => {
+
+    //api something
+  }
+  const products = [
+    { id: 1, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes' },
+    { id: 2, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes' },
+    { id: 3, name: 'Nike Zoom Vomero 5', price: 8895, category: 'Men\'s Shoes' },
+    { id: 4, name: 'Nike V2K Run', price: 6895, category: 'Women\'s Shoes' },
+    { id: 5, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes' },
+    { id: 6, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes' },
+    { id: 7, name: 'Nike P-6000', price: 4995, category: 'Shoes' },
+    { id: 8, name: 'Nike Cortez Leather', price: 4695, category: 'Men\'s Shoes' },
+    { id: 9, name: 'Nike Waffle Nav', price: 4295, category: 'Men\'s Shoes' },
+    { id: 10, name: 'Nike Air Pegasus 2005', price: 8395, category: 'Men\'s Shoes' },
+
+  ];
   return (
     <div className="app-container">
 
@@ -125,176 +142,26 @@ const Home = () => {
         </div>
 
         <div className="products-grid">
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/1.png"
-                alt="Nike Air Monarch IV"
-                className="product-image"
-                onClick={info}
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike Air Monarch IV</h3>
-                <p className="product-category">Men's Workout Shoes</p>
-                <p className="product-price">₱2,595</p>
+          {products.map((product) => (
+            <div className="product-card" key={product.id}>
+              <div className="product-image-container">
+                <img
+                  src={`./src/pictures/${product.id}.png`}
+                  alt={product.name}
+                  className="product-image"
+                  onClick={info}
+                />
+              </div>
+              <div className="product-info">
+                <div className="product-details">
+                  <h3 className="product-name">{product.name}</h3>
+                  <p className="product-category">{product.category}</p>
+                  <p className="product-price">₱{product.price}</p>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
 
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/2.png"
-                alt="Nike V2K Run"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike V2K Run</h3>
-                <p className="product-category">Men's Shoes</p>
-                <p className="product-price">₱6,895</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/3.png"
-                alt="Nike Zoom Vomero 5"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike Zoom Vomero 5</h3>
-                <p className="product-category">Men's Shoes</p>
-                <p className="product-price">₱8,895</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/4.png"
-                alt="Nike V2K Run"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike V2K Run</h3>
-                <p className="product-category">Women's Shoes</p>
-                <p className="product-price">₱6,895</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/5.png"
-                alt="Nike V2K Run"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike V2K Run</h3>
-                <p className="product-category">Men's Shoes</p>
-                <p className="product-price">₱6,895</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/6.png"
-                alt="Nike Air Monarch IV"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike Air Monarch IV</h3>
-                <p className="product-category">Men's Workout Shoes</p>
-                <p className="product-price">₱2,595</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/7.png"
-                alt="Nike P-6000"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike P-6000</h3>
-                <p className="product-category">Shoes</p>
-                <p className="product-price">₱4,995</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/8.png"
-                alt="Nike Cortez Leather"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike Cortez Leather</h3>
-                <p className="product-category">Men's Shoes</p>
-                <p className="product-price">₱4,695</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/9.png"
-                alt="Nike Waffle Nav"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike Waffle Nav</h3>
-                <p className="product-category">Men's Shoes</p>
-                <p className="product-price">₱4,295</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="product-card">
-            <div className="product-image-container">
-              <img
-                src="./src/pictures/10.png"
-                alt="Nike Air Pegasus 2005"
-                className="product-image"
-              />
-            </div>
-            <div className="product-info">
-              <div className="product-details">
-                <h3 className="product-name">Nike Air Pegasus 2005</h3>
-                <p className="product-category">Men's Shoes</p>
-                <p className="product-price">₱8,395</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="view-all-container">
