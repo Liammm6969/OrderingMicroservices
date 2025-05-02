@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { Bell, Search, ShoppingCart } from 'lucide-react';
 import '../styles/ProductInfo.css';
 import { useNavigate } from 'react-router-dom';
-
+import Navbar from "./Navbar";
 export default function ProductInfo() {
   const [selectedSize, setSelectedSize] = useState(null);
   const navigate = useNavigate();
-
-  function home(){
-    navigate("/home")
+  function home() {
+    navigate("/")
   }
   const sizes = [
     'US 6', 'US 6.5', 'US 7', 'US 7.5', 'US 8', 'US 8.5',
@@ -22,8 +21,8 @@ export default function ProductInfo() {
 
   return (
     <div className="info-container">
-
-      <header className="info-header">
+      <Navbar />
+      {/* <header className="info-header">
         <div className="info-hc">
           <div className="info-actions">
             <button className="icon-button">
@@ -37,7 +36,7 @@ export default function ProductInfo() {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       <main className="info-content">
         <div className="info-page">
@@ -46,14 +45,14 @@ export default function ProductInfo() {
             <ShoppingCart size={24} />
           </button>
         </div>
-        
+
         <div className="cont">
           <div className="product-desc">
             <p className="desc-txt">
-              Nike Air Monarch IV sets you up for working out with durable leather on top for support. 
+              Nike Air Monarch IV sets you up for working out with durable leather on top for support.
               Lightweight foam teams up with Nike Air cushioning for comfort in every stride.
             </p>
-            
+
             <h2 className="section-title">Benefits</h2>
             <ul className="benefits-list">
               <li>Leather and synthetic leather are durable with a classic look.</li>
@@ -61,23 +60,23 @@ export default function ProductInfo() {
               <li>Solid rubber sole is durable and provides traction over varied surfaces.</li>
             </ul>
           </div>
-          
+
           <div className="img-container">
-            <img 
-              src="./src/pictures/1.png" 
-              alt="Nike Air Monarch IV" 
+            <img
+              src="./src/pictures/1.png"
+              alt="Nike Air Monarch IV"
               className="info-image"
             />
           </div>
-          
+
           <div className="prod-info">
             <h2 className="prod-title">Nike Air Monarch IV</h2>
             <p className="prod-category">Men's Workout Shoes</p>
             <p className="prod-price">₱2,595</p>
-            
+
             <p className="size-label">Sizes available</p>
             <p className="size-tip">Fits small, we recommend ordering half a size up</p>
-            
+
             <div className="size-grid">
               {sizes.map((size) => (
                 <button
@@ -89,7 +88,7 @@ export default function ProductInfo() {
                 </button>
               ))}
             </div>
-            
+
             <div className="action-buttons">
               <button className="cart-button">
                 Add to cart

@@ -16,13 +16,18 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           {isAuthenticated ? (
             <>
               <Route path="/profile" element={<Profile />} />
               <Route path="/productinfo" element={<ProductInfo />} />
+              <Route path="/home" element={<Home />} />
+
             </>
           ) : (
-            <></>
+            <>
+
+            </>
           )}
 
 
