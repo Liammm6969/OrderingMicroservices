@@ -23,15 +23,14 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LoginButton from "../Auth/LoginButton"
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from 'react-router-dom';
-const pages = ['Home', 'Products', 'Categories', 'About Us'];
+const pages = ["Home", 'Products', 'Categories', 'About Us'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const Navbar = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { logout, user, isAuthenticated } = useAuth0();
+  const { logout, user, isAuthenticated, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
-
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -147,12 +146,22 @@ const Navbar = () => {
               <Button
                 key={page}
                 sx={{ my: 2, color: 'inherit', display: 'block' }}
+                onClick={() => {
+                  if (page === 'Products') {
+                    navigate('/productinfo');
+                  } else if (page === 'Categories') {
+                    navigate('/categories');
+                  } else if (page === 'About Us') {
+                    navigate('/aboutus');
+                  } else {
+                    navigate('/home');
+                  }
+                }}
               >
                 {page}
               </Button>
             ))}
           </Box>
-          <LoginButton />
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
@@ -184,12 +193,22 @@ const Navbar = () => {
                 ))}
 
               </MenuItem> */}
-              <MenuItem onClick={handleUserProfile}>
-                <Typography textAlign="center">Profile</Typography>
-              </MenuItem>
-              <MenuItem onClick={handleLogout}>
-                <Typography textAlign="center" >Logout</Typography>
-              </MenuItem>
+              {isAuthenticated ? (
+                <>
+                  <MenuItem onClick={handleUserProfile}>
+                    <Typography textAlign="center">Profile</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>
+                    <Typography textAlign="center">logout</Typography>
+                  </MenuItem>
+                </>
+
+              ) : (
+                <MenuItem onClick={loginWithRedirect}>
+                  <Typography textAlign="center">Login</Typography>
+                </MenuItem>
+              )}
+
 
             </Menu>
           </Box>

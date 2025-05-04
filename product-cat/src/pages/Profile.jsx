@@ -42,6 +42,7 @@ const Profile = () => {
         email: 'test'
     });
     useEffect(() => {
+        console.log(JSON.stringify(user, null, 2))
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
             setUserData(user);

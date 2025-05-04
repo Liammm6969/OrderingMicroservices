@@ -9,7 +9,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Profile from "./pages/Profile";
 
 function App() {
-  const [count, setCount] = useState(0)
+
   const { isAuthenticated } = useAuth0();
   return (
     <>
@@ -21,7 +21,7 @@ function App() {
             <>
               <Route path="/profile" element={<Profile />} />
               <Route path="/productinfo" element={<ProductInfo />} />
-              <Route path="/home" element={<Home />} />
+
 
             </>
           ) : (
