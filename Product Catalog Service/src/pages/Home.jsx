@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import '../styles/Home.css';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../pages/Navbar';
+import Navbar from './Navbar';
 const Home = () => {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
