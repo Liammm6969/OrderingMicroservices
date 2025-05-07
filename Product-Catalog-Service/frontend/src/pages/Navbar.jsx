@@ -17,11 +17,9 @@ import {
   ListItemText,
   ListItemButton,
   Divider
-} from '@mui/material';
+} from '../../node_modules/@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import LoginButton from "../Auth/LoginButton"
-import { useAuth0 } from "@auth0/auth0-react";
+
 import { useNavigate } from 'react-router-dom';
 const pages = ["Home", 'Products', 'Categories', 'About Us'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -29,7 +27,6 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const Navbar = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { logout, user, isAuthenticated, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
 
   const handleOpenUserMenu = (event) => {
@@ -47,15 +44,11 @@ const Navbar = () => {
     setDrawerOpen(open);
   };
   const handleUserProfile = () => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user, null, 2));
-      navigate('/profile');
-    }
-    console.log(isAuthenticated)
+
   }
 
   const handleLogout = () => {
-    logout({ returnTo: window.location.origin });
+
     localStorage.removeItem('user');
   }
   return (
@@ -166,7 +159,7 @@ const Navbar = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="User" src={user ? user.picture : ''} />
+                <Avatar alt="User" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -193,21 +186,6 @@ const Navbar = () => {
                 ))}
 
               </MenuItem> */}
-              {isAuthenticated ? (
-                <>
-                  <MenuItem onClick={handleUserProfile}>
-                    <Typography textAlign="center">Profile</Typography>
-                  </MenuItem>
-                  <MenuItem onClick={handleLogout}>
-                    <Typography textAlign="center">logout</Typography>
-                  </MenuItem>
-                </>
-
-              ) : (
-                <MenuItem onClick={loginWithRedirect}>
-                  <Typography textAlign="center">Login</Typography>
-                </MenuItem>
-              )}
 
 
             </Menu>
