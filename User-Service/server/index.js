@@ -29,6 +29,7 @@ app.post("/auth/login", async (req, res) => {
             return res.status(400).json({ message: "Password Incorrect" });
         }
         req.user = user;
+        console.log(user);
         return res.status(200).json({ message: "Login Successful", user });
     }
 });
@@ -48,6 +49,7 @@ app.post("/auth/register", async (req, res) => {
             name,
             password,
         });
+        req.user = newUser;
         await newUser.save();
         return res.status(200).json({ message: "User registered successfully", user: newUser });
     }

@@ -1,21 +1,21 @@
 const express = require("express");
 const app = express();
 const PORT = 7000;
-const mongoose = require("mongoose");
-const Product = require("./ProductModel");
+const mysql = require("mysql2/promise");
 const amqp = require("amqplib");
-var order;
 
+var order;
 var channel, connection;
 
+
+const db = mysql.createPool({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "product_service",
+});
+
 app.use(express.json());
-mongoose.connect(
-    "mongodb://localhost/product-service").then(() => {
-        console.log("Connected to MongoDB");
-    }
-    ).catch((err) => {
-        console.error("Error connecting to MongoDB", err);
-    });
 
 
 async function connect() {
@@ -28,43 +28,66 @@ async function connect() {
 connect();
 
 app.get("/product", async (req, res) => {
-    const products = await Product.find();
-    return res.status(200).json({
-        message: "Products fetched successfully",
-        products,
-    });
-}
-);
+    try {
+        const [products] = await db.query("SELECT * FROM products");
+        return res.status(200).json({
+            message: "Products fetched successfully",
+            products,
+        });
+    } catch (err) {
+        console.error("Error fetching products:", err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
 app.post("/product/buy", async (req, res) => {
     const { ids } = req.body;
-    const products = await Product.find({ _id: { $in: ids } });
-    channel.sendToQueue(
-        "ORDER",
-        Buffer.from(
-            JSON.stringify({
-                products,
-                userEmail: req.body.userEmail,
-            })
-        )
-    );
-    channel.consume("PRODUCT", (data) => {
-        order = JSON.parse(data.content);
-    });
-    return res.json(order);
+    try {
+        const [products] = await db.query(
+            "SELECT * FROM products WHERE id IN (?)",
+            [ids]
+        );
+        channel.sendToQueue(
+            "ORDER",
+            Buffer.from(
+                JSON.stringify({
+                    products,
+                    email: req.body.userEmail,
+                })
+            )
+        );
+        channel.consume("PRODUCT", (data) => {
+            order = JSON.parse(data.content);
+        });
+        console.log(req.body);
+        return res.json(order);
+    } catch (err) {
+        console.error("Error buying products:", err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 });
+
 
 app.post("/product/create", async (req, res) => {
     const { name, description, price, size } = req.body;
-    const newProduct = new Product({
-        name,
-        description,
-        price,
-        size
-    });
-    newProduct.save();
-    return res.json(newProduct);
+    try {
+        const [result] = await db.query(
+            "INSERT INTO products (name, description, price, size) VALUES (?, ?, ?, ?)",
+            [name, description, price, size]
+        );
+        return res.json({
+            id: result.insertId,
+            name,
+            description,
+            price,
+            size,
+        });
+    } catch (err) {
+        console.error("Error creating product:", err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 });
-
 
 app.listen(PORT, () => {
     console.log(`Product-Service at ${PORT}`);

@@ -1,35 +1,45 @@
 const express = require("express");
 const app = express();
 const PORT = 8000;
-const mongoose = require("mongoose");
-const Order = require("./OrderModel");
+const { Pool } = require("pg");
 const amqp = require("amqplib");
 
 var channel, connection;
 
-mongoose.connect(
-    "mongodb://localhost/order-service",).then(() => {
-        console.log("MongoDB connected successfully");
-    }
-    ).catch((err) => {
-        console.log("MongoDB connection error: ", err);
-    }
-    );
+
+const pool = new Pool({
+    user: "postgres",
+    host: "localhost",
+    database: "order_service",
+    password: "selerqc",
+    port: 5432,
+});
+
 app.use(express.json());
 
-function createOrder(products, userEmail) {
+
+async function createOrder(products, email) {
     let total = 0;
     for (let t = 0; t < products.length; ++t) {
         total += products[t].price;
     }
-    const newOrder = new Order({
-        products,
-        user: userEmail,
-        total_price: total,
-    });
-    newOrder.save();
-    return newOrder;
+
+    const client = await pool.connect();
+    try {
+
+        const result = await client.query(
+            `INSERT INTO orders (products, user_email, total_price) VALUES ($1, $2, $3) RETURNING *`,
+            [JSON.stringify(products), email, total]
+        );
+        return result.rows[0];
+    } catch (err) {
+        console.error("Error creating order:", err);
+        throw err;
+    } finally {
+        client.release();
+    }
 }
+
 async function connect() {
     const amqpServer = "amqp://localhost";
     connection = await amqp.connect(amqpServer);
@@ -37,16 +47,21 @@ async function connect() {
     await channel.assertQueue("ORDER");
     console.log("Connected to RabbitMQ-order-service");
 }
+
 connect().then(() => {
-    channel.consume("ORDER", (data) => {
+    channel.consume("ORDER", async (data) => {
         console.log("Consuming ORDER service");
-        const { products, userEmail } = JSON.parse(data.content);
-        const newOrder = createOrder(products, userEmail);
-        channel.ack(data);
-        channel.sendToQueue(
-            "PRODUCT",
-            Buffer.from(JSON.stringify({ newOrder }))
-        );
+        const { products, email } = JSON.parse(data.content);
+        try {
+            const newOrder = await createOrder(products, email);
+            channel.ack(data);
+            channel.sendToQueue(
+                "PRODUCT",
+                Buffer.from(JSON.stringify({ newOrder }))
+            );
+        } catch (err) {
+            console.error("Error processing order:", err);
+        }
     });
 });
 
