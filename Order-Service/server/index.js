@@ -4,7 +4,7 @@ const PORT = 8000;
 const { Pool } = require("pg");
 const amqp = require("amqplib");
 
-var channel, connection;
+let channel, connection;
 
 
 const pool = new Pool({

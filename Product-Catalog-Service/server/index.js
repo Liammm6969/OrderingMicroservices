@@ -4,8 +4,8 @@ const PORT = 7000;
 const mysql = require("mysql2/promise");
 const amqp = require("amqplib");
 
-var order;
-var channel, connection;
+let order;
+let channel, connection;
 
 
 const db = mysql.createPool({
