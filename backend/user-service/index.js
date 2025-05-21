@@ -3,9 +3,19 @@ const app = express();
 const PORT = 9000;
 const mongoose = require("mongoose");
 const User = require("./UserModel");
+const dotenv = require("dotenv");
+dotenv.config();
 
 
-mongoose.connect("mongodb://localhost/auth-service").then(() => {
+// In your app.js
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
+
+mongoose.connect(process.env.MONGODB_URI).then(() => {
     console.log("MongoDB connected successfully");
 }
 ).catch((err) => {
@@ -14,7 +24,66 @@ mongoose.connect("mongodb://localhost/auth-service").then(() => {
 );
 
 app.use(express.json());
-
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Authenticates a user with email and password.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address.
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's password.
+ *             example:
+ *               email: "user@example.com"
+ *               password: "securePassword123"
+ *     responses:
+ *       200:
+ *         description: Login Successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Missing fields or incorrect password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: User doesn't exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 app.post("/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -34,9 +103,61 @@ app.post("/auth/login", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Creates a new user account with email, password, and name.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address.
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's password.
+ *              
+ *             example:
+ *               email: "user@example.com"
+ *               password: "securePassword123"
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Missing fields or user already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 app.post("/auth/register", async (req, res) => {
-    const { email, password, name } = req.body;
-    if (!email || !password || !name) {
+    const { email, password,  } = req.body;
+    if (!email || !password ) {
         return res.status(400).json({ message: "Please fill all fields" });
     }
     const userExists = await User.findOne({ email });
@@ -46,7 +167,6 @@ app.post("/auth/register", async (req, res) => {
     } else {
         const newUser = new User({
             email,
-            name,
             password,
         });
         req.user = newUser;
@@ -57,4 +177,5 @@ app.post("/auth/register", async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    console.log('Swagger docs at http://localhost:9000/api-docs');
 });
