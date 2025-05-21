@@ -3,12 +3,30 @@ import { Bell, Search, ShoppingCart } from 'lucide-react';
 import '../styles/ProductInfo.css';
 import { useNavigate } from 'react-router-dom';
 import Navbar from "./Navbar";
+import { useCart } from "../context/CartContext";
+
 export default function ProductInfo() {
   const [selectedSize, setSelectedSize] = useState(null);
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+
   function home() {
     navigate("/")
   }
+
+  function handleAddToCart() {
+    addToCart({
+      id: 1,
+      name: "Nike Air Monarch IV",
+      description: "Men's Workout Shoes",
+      price: 2595,
+      size: selectedSize,
+      image: "./src/pictures/1.png",
+      quantity: 1,
+    });
+    navigate("/addtocart");
+  }
+
   const sizes = [
     'US 6', 'US 6.5', 'US 7', 'US 7.5', 'US 8', 'US 8.5',
     'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5',
@@ -90,7 +108,7 @@ export default function ProductInfo() {
             </div>
 
             <div className="action-buttons">
-              <button className="cart-button">
+              <button className="cart-button" onClick={handleAddToCart} disabled={!selectedSize}>
                 Add to cart
               </button>
               <button className="back-button" onClick={home}>

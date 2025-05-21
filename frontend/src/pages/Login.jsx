@@ -7,7 +7,10 @@ function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  
+  function SignUp() {
+    navigate("/signup");
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
    axios.post("http://localhost:9000/auth/login", formData)
@@ -58,7 +61,7 @@ function Login() {
             <div className='form-footer'>
               <div className='signup-link'>
                 <span>Don't have an account yet?</span>
-                <a href='#'>
+                <a href='#' onClick={SignUp}>
                   {" "}
                   <u>Sign Up</u>
                 </a>
