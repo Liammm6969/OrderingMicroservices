@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import { TextField } from "@mui/material";
-
+import axios from "axios";
 export default function Signup() {
   const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "" });
   const [loading, setLoading] = useState(false);
@@ -28,13 +28,10 @@ export default function Signup() {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:9000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Registration failed");
+      const response = await axios.post("http://localhost:9000/auth/register", formData);
+      if (response.status !== 200) {
+        throw new Error("Registration failed");
+      }
       setSuccess(true);
       setFormData({ email: "", password: "", confirmPassword: "" });
     } catch (err) {
@@ -45,9 +42,9 @@ export default function Signup() {
   };
 
   return (
-    
+
     <div className='login-container'>
-        <div className='loginBg'>
+      <div className='loginBg'>
         <h1 className='app-name'>E-Commerce</h1>
         <p className='message'>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam,
@@ -118,7 +115,7 @@ export default function Signup() {
           </form>
         </div>
       </div>
-      
+
     </div>
   );
 } 
