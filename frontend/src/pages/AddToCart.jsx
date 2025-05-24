@@ -27,7 +27,7 @@ export default function AddToCart() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:7000/product/buy", {
+      const response = await fetch("http://localhost:5003/api/cart/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -5,6 +5,10 @@ const mongoose = require("mongoose");
 const User = require("./UserModel");
 const dotenv = require("dotenv");
 dotenv.config();
+const cors = require("cors");
+
+app.use(cors());
+app.use(express.json());
 
 
 // In your app.js
@@ -15,7 +19,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 
-mongoose.connect(process.env.MONGODB_URI).then(() => {
+mongoose.connect("mongodb://localhost:27017/user-service").then(() => {
     console.log("MongoDB connected successfully");
 }
 ).catch((err) => {
@@ -156,8 +160,8 @@ app.post("/auth/login", async (req, res) => {
  *                   type: string
  */
 app.post("/auth/register", async (req, res) => {
-    const { email, password,  } = req.body;
-    if (!email || !password ) {
+    const { email, password, } = req.body;
+    if (!email || !password) {
         return res.status(400).json({ message: "Please fill all fields" });
     }
     const userExists = await User.findOne({ email });

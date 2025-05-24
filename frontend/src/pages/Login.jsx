@@ -4,21 +4,21 @@ import "../styles/Login.css";
 import { TextField } from "@mui/material";
 import axios from "axios";
 function Login() {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  
+
   function SignUp() {
     navigate("/signup");
   }
   const handleSubmit = (e) => {
     e.preventDefault();
-   axios.post("http://localhost:9000/auth/login", formData)
+    axios.post("http://localhost:9000/auth/login", formData)
       .then((response) => {
         setTimeout(() => {
-            alert("Login Successful");
-            navigate("/home");
-            } , 2000);
+          alert("Login Successful");
+          navigate("/home");
+        }, 2000);
       })
       .catch((error) => {
         console.error("There was an error logging in!", error);
@@ -33,11 +33,12 @@ function Login() {
           <form className='login-form' onSubmit={handleSubmit}>
             <div className='form-group'>
               <TextField
-                type='text'
+                type='email'
                 variant='standard'
-                name='username'
-                placeholder='Username'
-                value={formData.username}
+                name='email'
+                placeholder='Email'
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
                 className='form-input'
               />
@@ -50,6 +51,7 @@ function Login() {
                 placeholder='Password'
                 variant='standard'
                 value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 className='form-input'
               />
