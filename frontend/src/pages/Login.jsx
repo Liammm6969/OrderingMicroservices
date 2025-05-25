@@ -15,6 +15,10 @@ function Login() {
     e.preventDefault();
     axios.post("http://localhost:9000/auth/login", formData)
       .then((response) => {
+        // Assuming response.data contains user info with userId
+        if (response.data && response.data.userId) {
+          localStorage.setItem("userId", response.data.userId);
+        }
         setTimeout(() => {
           alert("Login Successful");
           navigate("/home");

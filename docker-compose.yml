@@ -20,6 +20,16 @@ services:
       - "3002:3002"
     environment:
       - NODE_ENV=production
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    restart: always
   user-service:
     build: ./backend/user-service
     ports:

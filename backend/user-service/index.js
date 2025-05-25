@@ -103,7 +103,7 @@ app.post("/auth/login", async (req, res) => {
         }
         req.user = user;
         console.log(user);
-        return res.status(200).json({ message: "Login Successful", user });
+        return res.status(200).json({ message: "Login Successful", userId: user._id });
     }
 });
 
