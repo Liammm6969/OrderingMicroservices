@@ -15,3 +15,5 @@ This repository contains the microservices responsible for handling orders, incl
 
 ## 🧱 Microservices Architecture
 
+## Rabbit MQ
+![Result](image.png)
