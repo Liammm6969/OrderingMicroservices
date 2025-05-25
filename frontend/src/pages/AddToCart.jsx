@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/AddToCart.css";
-
+import Navbar from "./Navbar";
 export default function AddToCart() {
-  const { cartItem, updateCart, removeFromCart } = useCart();
+  const { cartItems, updateCart, removeFromCart, getCartTotal } = useCart();
   const [showModal, setShowModal] = useState(false);
   const [checkoutName, setCheckoutName] = useState("");
   const [checkoutEmail, setCheckoutEmail] = useState("");
@@ -13,13 +13,14 @@ export default function AddToCart() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleQuantity = (delta) => {
-    if (!cartItem) return;
-    updateCart({ quantity: Math.max(1, (cartItem.quantity || 1) + delta) });
+  const handleQuantity = (item, delta) => {
+    updateCart(item.id, item.size, { 
+      quantity: Math.max(1, (item.quantity || 1) + delta) 
+    });
   };
 
-  const subtotal = cartItem ? cartItem.price * cartItem.quantity : 0;
   const deliveryFee = 0;
+  const subtotal = getCartTotal();
   const total = subtotal + deliveryFee;
 
   const handleCheckout = async (e) => {
@@ -31,13 +32,17 @@ export default function AddToCart() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ids: [cartItem.id],
+          items: cartItems.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            size: item.size
+          })),
           userEmail: checkoutEmail,
         }),
       });
       if (!response.ok) throw new Error("Failed to place order");
       setOrderSuccess(true);
-      removeFromCart();
+      cartItems.forEach(item => removeFromCart(item.id, item.size));
       setShowModal(false);
       setCheckoutName("");
       setCheckoutEmail("");
@@ -54,51 +59,52 @@ export default function AddToCart() {
 
   return (
     <div className="cart-root">
+      <Navbar />
       <div className="cart-container">
         <h2 className="cart-title">Your cart</h2>
         <div className="cart-content">
           <div className="cart-items">
-            {cartItem ? (
-              <div className="cart-item-row">
-                <img
-                  src={cartItem.image}
-                  alt={cartItem.name}
-                  className="cart-item-image"
-                />
-                <div className="cart-item-info">
-                  <div className="cart-item-name">{cartItem.name}</div>
-                  <div className="cart-item-desc">{cartItem.description}</div>
-                  <div className="cart-item-size">Size: {cartItem.size || <span className="cart-item-size-empty">-</span>}</div>
+            {cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <div key={`${item.id}-${item.size}`} className="cart-item-row">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="cart-item-image"
+                  />
+                  <div className="cart-item-info">
+                    <div className="cart-item-name">{item.name}</div>
+                    <div className="cart-item-desc">{item.description}</div>
+                    <div className="cart-item-size">Size: {item.size || <span className="cart-item-size-empty">-</span>}</div>
+                  </div>
+                  <div className="cart-item-price">₱{item.price.toLocaleString()}</div>
+                  <div className="cart-controls">
+                    <button
+                      onClick={() => removeFromCart(item.id, item.size)}
+                      className="cart-remove-btn"
+                      title="Remove"
+                    >
+                      <span role="img" aria-label="delete">🗑️</span>
+                    </button>
+                    <span className="cart-qty">{item.quantity}</span>
+                    <button
+                      onClick={() => handleQuantity(item, -1)}
+                      className="cart-qty-btn"
+                      disabled={item.quantity === 1}
+                    >
+                      -
+                    </button>
+                    <button
+                      onClick={() => handleQuantity(item, 1)}
+                      className="cart-qty-btn"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-                <div className="cart-item-price">₱{cartItem.price.toLocaleString()}</div>
-              </div>
+              ))
             ) : (
               <div className="cart-empty">Your cart is empty.</div>
-            )}
-            {cartItem && (
-              <div className="cart-controls">
-                <button
-                  onClick={removeFromCart}
-                  className="cart-remove-btn"
-                  title="Remove"
-                >
-                  <span role="img" aria-label="delete">🗑️</span>
-                </button>
-                <span className="cart-qty">{cartItem.quantity}</span>
-                <button
-                  onClick={() => handleQuantity(-1)}
-                  className="cart-qty-btn"
-                  disabled={cartItem.quantity === 1}
-                >
-                  -
-                </button>
-                <button
-                  onClick={() => handleQuantity(1)}
-                  className="cart-qty-btn"
-                >
-                  +
-                </button>
-              </div>
             )}
             <hr className="cart-divider" />
           </div>
@@ -106,20 +112,20 @@ export default function AddToCart() {
             <div className="cart-summary-title">Summary</div>
             <div className="cart-summary-row">
               <span>Subtotal</span>
-              <span>{cartItem ? `₱${subtotal.toLocaleString()}` : '-'}</span>
+              <span>{cartItems.length > 0 ? `₱${subtotal.toLocaleString()}` : '-'}</span>
             </div>
             <div className="cart-summary-row">
               <span>Estimated Delivery Fee</span>
-              <span>{cartItem ? `₱${deliveryFee}` : '-'}</span>
+              <span>{cartItems.length > 0 ? `₱${deliveryFee}` : '-'}</span>
             </div>
             <hr className="cart-summary-divider" />
             <div className="cart-summary-total-row">
               <span>Total</span>
-              <span>{cartItem ? `₱${total.toLocaleString()}` : '-'}</span>
+              <span>{cartItems.length > 0 ? `₱${total.toLocaleString()}` : '-'}</span>
             </div>
             <button
               className="cart-checkout-btn"
-              disabled={!cartItem}
+              disabled={cartItems.length === 0}
               onClick={() => setShowModal(true)}
             >
               Check Out
