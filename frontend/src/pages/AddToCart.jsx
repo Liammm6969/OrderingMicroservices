@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/AddToCart.css";
-
+import axios from "axios";
 export default function AddToCart() {
   const { cartItem, updateCart, removeFromCart } = useCart();
   const [showModal, setShowModal] = useState(false);
@@ -27,15 +27,16 @@ export default function AddToCart() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:5003/api/cart/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ids: [cartItem.id],
-          userEmail: checkoutEmail,
-        }),
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setError("User ID is missing. Please log in.");
+        setLoading(false);
+        return;
+      }
+      const response = await axios.post("http://localhost:5003/api/cart/checkout", {
+        userId,
       });
-      if (!response.ok) throw new Error("Failed to place order");
+      if (response.status !== 201) throw new Error("Failed to place order");
       setOrderSuccess(true);
       removeFromCart();
       setShowModal(false);
@@ -44,7 +45,8 @@ export default function AddToCart() {
       setCheckoutAddress("");
       setPaymentMethod("Cash on Delivery");
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      // setError(err.message || "Something went wrong");
+      console.log("Checkout error:", err);
     } finally {
       setLoading(false);
     }

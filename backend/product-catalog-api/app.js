@@ -16,7 +16,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 listenToOrderPlaced();
 
-const PORT = 3000;
+
+
+const PORT = 3002;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
