@@ -1,27 +1,35 @@
 import { useState } from 'react';
 import { Bell, Search, ShoppingCart } from 'lucide-react';
 import '../styles/ProductInfo.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from "./Navbar";
 import { useCart } from "../context/CartContext";
 
 export default function ProductInfo() {
   const [selectedSize, setSelectedSize] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToCart } = useCart();
+  const product = location.state?.product;
+
+  // If no product data is available, redirect to home
+  if (!product) {
+    navigate('/home');
+    return null;
+  }
 
   function home() {
-    navigate("/")
+    navigate("/home")
   }
 
   function handleAddToCart() {
     addToCart({
-      id: 1,
-      name: "Nike Air Monarch IV",
-      description: "Men's Workout Shoes",
-      price: 2595,
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
       size: selectedSize,
-      image: "./src/pictures/1.png",
+      image: product.image,
       quantity: 1,
     });
     navigate("/addtocart");
@@ -59,16 +67,12 @@ export default function ProductInfo() {
       <main className="info-content">
         <div className="info-page">
           <h1 className="title">Products</h1>
-          <button className="icon-button">
-            <ShoppingCart size={24} />
-          </button>
         </div>
 
         <div className="cont">
           <div className="product-desc">
             <p className="desc-txt">
-              Nike Air Monarch IV sets you up for working out with durable leather on top for support.
-              Lightweight foam teams up with Nike Air cushioning for comfort in every stride.
+              {product.description}
             </p>
 
             <h2 className="section-title">Benefits</h2>
@@ -81,16 +85,16 @@ export default function ProductInfo() {
 
           <div className="img-container">
             <img
-              src="./src/pictures/1.png"
-              alt="Nike Air Monarch IV"
+              src={product.image}
+              alt={product.name}
               className="info-image"
             />
           </div>
 
           <div className="prod-info">
-            <h2 className="prod-title">Nike Air Monarch IV</h2>
-            <p className="prod-category">Men's Workout Shoes</p>
-            <p className="prod-price">₱2,595</p>
+            <h2 className="prod-title">{product.name}</h2>
+            <p className="prod-category">{product.category}</p>
+            <p className="prod-price">₱{product.price.toLocaleString()}</p>
 
             <p className="size-label">Sizes available</p>
             <p className="size-tip">Fits small, we recommend ordering half a size up</p>

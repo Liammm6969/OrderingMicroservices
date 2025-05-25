@@ -1,23 +1,25 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Search,
   Bell,
-  ShoppingCart,
   ChevronDown,
   SlidersHorizontal
 } from 'lucide-react';
 import '../styles/Home.css';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+
 const Home = () => {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [sortBy, setSortBy] = useState('Featured');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const navigate = useNavigate();
 
-  function info() {
-    navigate('/productinfo')
+  function info(product) {
+    navigate('/productinfo', { state: { product } });
   }
+
   const toggleSortMenu = () => {
     setShowSortMenu(!showSortMenu);
     if (showFilterMenu) setShowFilterMenu(false);
@@ -33,42 +35,54 @@ const Home = () => {
     setShowSortMenu(false);
   };
 
-  const getAllProducts = () => {
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setShowFilterMenu(false);
+  };
 
-    //api something
-  }
   const products = [
-    { id: 1, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes' },
-    { id: 2, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes' },
-    { id: 3, name: 'Nike Zoom Vomero 5', price: 8895, category: 'Men\'s Shoes' },
-    { id: 4, name: 'Nike V2K Run', price: 6895, category: 'Women\'s Shoes' },
-    { id: 5, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes' },
-    { id: 6, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes' },
-    { id: 7, name: 'Nike P-6000', price: 4995, category: 'Shoes' },
-    { id: 8, name: 'Nike Cortez Leather', price: 4695, category: 'Men\'s Shoes' },
-    { id: 9, name: 'Nike Waffle Nav', price: 4295, category: 'Men\'s Shoes' },
-    { id: 10, name: 'Nike Air Pegasus 2005', price: 8395, category: 'Men\'s Shoes' },
-
+    { id: 1, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes', description: 'Men\'s Workout Shoes', image: './src/pictures/1.png' },
+    { id: 2, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/2.png' },
+    { id: 3, name: 'Nike Zoom Vomero 5', price: 8895, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/3.png' },
+    { id: 4, name: 'Nike V2K Run', price: 6895, category: 'Women\'s Shoes', description: 'Women\'s Shoes', image: './src/pictures/4.png' },
+    { id: 5, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/5.png' },
+    { id: 6, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes', description: 'Men\'s Workout Shoes', image: './src/pictures/6.png' },
+    { id: 7, name: 'Nike P-6000', price: 4995, category: 'Shoes', description: 'Shoes', image: './src/pictures/7.png' },
+    { id: 8, name: 'Nike Cortez Leather', price: 4695, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/8.png' },
+    { id: 9, name: 'Nike Waffle Nav', price: 4295, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/9.png' },
+    { id: 10, name: 'Nike Air Pegasus 2005', price: 8395, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/10.png' },
   ];
+
+  // Get unique categories for filter menu
+  const categories = useMemo(() => {
+    const uniqueCategories = ['All', ...new Set(products.map(product => product.category))];
+    return uniqueCategories;
+  }, [products]);
+
+  // Filter and sort products
+  const filteredAndSortedProducts = useMemo(() => {
+    // First filter by category
+    let filtered = selectedCategory === 'All' 
+      ? products 
+      : products.filter(product => product.category === selectedCategory);
+
+    // Then sort the filtered products
+    switch (sortBy) {
+      case 'Price: Low to High':
+        return [...filtered].sort((a, b) => a.price - b.price);
+      case 'Price: High to Low':
+        return [...filtered].sort((a, b) => b.price - a.price);
+      case 'Newest':
+        return [...filtered].sort((a, b) => b.id - a.id);
+      case 'Featured':
+      default:
+        return filtered;
+    }
+  }, [products, selectedCategory, sortBy]);
+
   return (
     <div className="app-container">
-
       <header className="header">
-        {/* <div className="header-content">
-          <div className="header-actions">
-            <button className="icon-button">
-              <Search size={20} />
-            </button>
-            <button className="icon-button">
-              <Bell size={20} />
-            </button>
-            <img 
-              src="/api/placeholder/36/36" 
-              alt="User Profile" 
-              className="avatar"
-            />
-          </div>
-        </div> */}
         <Navbar />
       </header>
 
@@ -83,15 +97,20 @@ const Home = () => {
                 onClick={toggleFilterMenu}
               >
                 <SlidersHorizontal size={16} className="button-icon" />
-                <span>Filters</span>
+                <span>Filters: {selectedCategory}</span>
               </button>
 
               {showFilterMenu && (
                 <div className="dropdown-menu">
-                  <button className="dropdown-item">All</button>
-                  <button className="dropdown-item">Men's Shoes</button>
-                  <button className="dropdown-item">Women's Shoes</button>
-                  <button className="dropdown-item">Workout Shoes</button>
+                  {categories.map((category) => (
+                    <button 
+                      key={category}
+                      className="dropdown-item"
+                      onClick={() => handleCategorySelect(category)}
+                    >
+                      {category}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -134,34 +153,29 @@ const Home = () => {
                 </div>
               )}
             </div>
-
-            <button className="cart-button">
-              <ShoppingCart size={20} />
-            </button>
           </div>
         </div>
 
         <div className="products-grid">
-          {products.map((product) => (
+          {filteredAndSortedProducts.map((product) => (
             <div className="product-card" key={product.id}>
               <div className="product-image-container">
                 <img
-                  src={`./src/pictures/${product.id}.png`}
+                  src={product.image}
                   alt={product.name}
                   className="product-image"
-                  onClick={info}
+                  onClick={() => info(product)}
                 />
               </div>
               <div className="product-info">
                 <div className="product-details">
                   <h3 className="product-name">{product.name}</h3>
                   <p className="product-category">{product.category}</p>
-                  <p className="product-price">₱{product.price}</p>
+                  <p className="product-price">₱{product.price.toLocaleString()}</p>
                 </div>
               </div>
             </div>
           ))}
-
         </div>
 
         <div className="view-all-container">

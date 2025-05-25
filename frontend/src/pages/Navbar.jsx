@@ -16,11 +16,14 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  Divider
+  Divider,
+  Badge
 } from '../../node_modules/@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+
 const pages = ["Home", 'Products', 'Categories', 'About Us'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -28,6 +31,7 @@ const Navbar = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const { getCartCount } = useCart();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -43,19 +47,15 @@ const Navbar = () => {
     }
     setDrawerOpen(open);
   };
-  const handleUserProfile = () => {
 
-  }
+  const handleCartClick = () => {
+    navigate('/addtocart');
+  };
 
-  const handleLogout = () => {
-
-    localStorage.removeItem('user');
-  }
   return (
     <AppBar position="static" color="default" elevation={1}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-
           <Typography
             variant="h6"
             noWrap
@@ -73,7 +73,6 @@ const Navbar = () => {
           >
             Shopashoes
           </Typography>
-
 
           <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -113,7 +112,6 @@ const Navbar = () => {
               </Box>
             </Drawer>
           </Box>
-
 
           <Typography
             variant="h6"
@@ -156,39 +154,44 @@ const Navbar = () => {
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="User" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Tooltip title="View Cart">
+              <IconButton onClick={handleCartClick} sx={{ p: 0 }}>
+                <Badge badgeContent={getCartCount()} color="error">
+                  <ShoppingCartIcon />
+                </Badge>
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {/* <MenuItem onClick={handleCloseUserMenu}>
+
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="User" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
                 {settings.map((setting) => (
                   <MenuItem key={setting} onClick={handleCloseUserMenu}>
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>
                 ))}
-
-              </MenuItem> */}
-
-
-            </Menu>
+              </Menu>
+            </Box>
           </Box>
         </Toolbar>
       </Container>
