@@ -21,4 +21,5 @@ listenToOrderPlaced();
 const PORT = 3002;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
 });
