@@ -54,10 +54,13 @@ router.get('/:id', controller.getById);
  *             required:
  *               - name
  *               - price
+ *               - stock
  *             properties:
  *               name:
  *                 type: string
  *               price:
+ *                 type: number
+ *               stock:
  *                 type: number
  *     responses:
  *       201:
@@ -75,7 +78,7 @@ router.post('/', controller.create);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Product deleted
