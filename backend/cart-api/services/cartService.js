@@ -1,8 +1,11 @@
-const { redisClient } = require('../config/redisClient');
+const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
 
-const PRODUCT_API_URL = 'http://localhost:3000/api/products'; // Adjust as needed
+const PRODUCT_API_URL = 'http://localhost:3002/api/products'; // Adjust as needed
 const ORDER_API_URL = 'http://localhost:4000/api/orders'; // Assuming order service is on port 4000
+
+// In-memory cart storage: { userId: { productId: quantity, ... }, ... }
+const carts = {};
 
 class CartService {
   async addToCart(userId, productId, quantity) {
@@ -10,32 +13,34 @@ class CartService {
     if (!product) throw new Error('Product not found');
     if (product.stock < quantity) throw new Error('Not enough stock');
 
-    const key = `cart:${userId}`;
-    const existingQty = parseInt(await redisClient.hGet(key, productId)) || 0;
+    if (!carts[userId]) carts[userId] = {};
+    const existingQty = parseInt(carts[userId][productId] || 0);
     const newQty = existingQty + parseInt(quantity);
 
     if (newQty > product.stock) {
       throw new Error('Adding this quantity exceeds available stock');
     }
 
-    await redisClient.hSet(key, productId, newQty);
+    carts[userId][productId] = newQty;
+    console.log(`Added ${quantity} of product ${productId} to cart for user ${userId}`);
+    console.log(`Current quantity in cart: ${newQty}`);
     return { productId, quantity: newQty };
   }
 
   async getCart(userId) {
-    const key = `cart:${userId}`;
-    return await redisClient.hGetAll(key);
+    return carts[userId] || {};
   }
 
   async removeFromCart(userId, productId) {
-    const key = `cart:${userId}`;
-    await redisClient.hDel(key, productId);
-    return { productId, removed: true };
+    if (carts[userId] && carts[userId][productId]) {
+      delete carts[userId][productId];
+      return { productId, removed: true };
+    }
+    return { productId, removed: false };
   }
 
   async checkout(userId) {
-    const key = `cart:${userId}`;
-    const cart = await redisClient.hGetAll(key);
+    const cart = carts[userId];
     if (!cart || Object.keys(cart).length === 0) {
       throw new Error('Cart is empty');
     }
@@ -50,9 +55,8 @@ class CartService {
 
     try {
       const response = await axios.post(ORDER_API_URL, orderData);
-      console.log(response);
       if (response.status === 201) {
-        await redisClient.del(key);
+        delete carts[userId];
         return { success: true, order: response.data };
       } else {
         throw new Error('Order service failed to create the order');
