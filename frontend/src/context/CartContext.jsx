@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import axios from "axios";
 
 const CartContext = createContext();
 
@@ -9,7 +10,7 @@ export function useCart() {
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
 
-  const addToCart = (product) => {
+  const addToCart = async (product) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id && item.size === product.size);
       if (existingItem) {
@@ -21,6 +22,18 @@ export function CartProvider({ children }) {
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
+    // Send to backend cart-api
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+      await axios.post("http://localhost:3000/api/cart", {
+        userId,
+        productId: product.id || product._id,
+        quantity: 1,
+      });
+    } catch (err) {
+      console.error("Failed to add to cart backend:", err);
+    }
   };
 
   const updateCart = (productId, size, updates) => {
@@ -33,10 +46,23 @@ export function CartProvider({ children }) {
     );
   };
 
-  const removeFromCart = (productId, size) => {
+  const removeFromCart = async (productId, size) => {
     setCartItems(prevItems =>
       prevItems.filter(item => !(item.id === productId && item.size === size))
     );
+    // Send to backend cart-api
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+      await axios.delete("http://localhost:3000/api/cart", {
+        data: {
+          userId,
+          productId
+        }
+      });
+    } catch (err) {
+      console.error("Failed to remove from cart backend:", err);
+    }
   };
 
   const getCartTotal = () => {
@@ -48,10 +74,10 @@ export function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems, 
-      addToCart, 
-      updateCart, 
+    <CartContext.Provider value={{
+      cartItems,
+      addToCart,
+      updateCart,
       removeFromCart,
       getCartTotal,
       getCartCount

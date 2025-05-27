@@ -24,15 +24,15 @@ export default function ProductInfo() {
 
   function handleAddToCart() {
     addToCart({
-      id: product.id,
+      _id: product._id,
       name: product.name,
-      description: product.description,
       price: product.price,
-      size: selectedSize,
       image: product.image,
-      quantity: 1,
+      category: product.category,
     });
-    navigate("/addtocart");
+
+    console.log(`Added to cart: ${product.name}, Size: ${selectedSize}`);
+    navigate("/home");
   }
 
   const sizes = [

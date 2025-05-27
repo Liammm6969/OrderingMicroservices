@@ -15,8 +15,8 @@ export default function AddToCart() {
   const [error, setError] = useState("");
 
   const handleQuantity = (item, delta) => {
-    updateCart(item.id, item.size, { 
-      quantity: Math.max(1, (item.quantity || 1) + delta) 
+    updateCart(item.id, item.size, {
+      quantity: Math.max(1, (item.quantity || 1) + delta)
     });
   };
 
@@ -29,13 +29,13 @@ export default function AddToCart() {
     setLoading(true);
     setError("");
     try {
-  const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("userId");
       if (!userId) {
         setError("User ID is missing. Please log in.");
         setLoading(false);
         return;
       }
-      const response = await axios.post("http://localhost:5003/api/cart/checkout", {
+      const response = await axios.post("http://localhost:3000/api/cart/checkout", {
         userId,
       });
       if (response.status !== 201) throw new Error("Failed to place order");
