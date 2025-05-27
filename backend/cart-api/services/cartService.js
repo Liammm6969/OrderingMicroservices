@@ -62,7 +62,7 @@ class CartService {
         throw new Error('Order service failed to create the order');
       }
     } catch (err) {
-      throw new Error(`Checkout failed: ${err.message}`);
+      throw new Error(`Checkout failed: ${err}`);
     }
   }
 

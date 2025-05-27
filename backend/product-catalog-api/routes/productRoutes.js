@@ -60,6 +60,8 @@ router.get('/:id', controller.getById);
  *                 type: string
  *               price:
  *                 type: number
+ *              category:
+ *                type: string
  *               stock:
  *                 type: number
  *     responses:

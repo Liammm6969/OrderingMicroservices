@@ -22,7 +22,7 @@ class EventBus {
     this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {
       persistent: true,
     });
-    console.log(`Published event to ${queue}`, message);
+    console.log(`Published event to ${queue}`, message,);
   }
 
   async subscribe(queue, handler) {

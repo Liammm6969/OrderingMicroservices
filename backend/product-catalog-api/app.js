@@ -6,6 +6,10 @@ const swaggerSpec = require('./swagger');
 const productRoutes = require('./routes/productRoutes');
 const listenToOrderPlaced = require('./handlers/orderHandler');
 const eventBus = require('./events/eventsBus');
+
+const cors = require('cors');
+
+app.use(cors()); // Enable CORS for all routes
 connectDB();
 
 app.use(express.json());

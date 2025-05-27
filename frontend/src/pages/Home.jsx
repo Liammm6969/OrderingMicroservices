@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use, useEffect } from 'react';
 import {
   Search,
   Bell,
@@ -8,13 +8,31 @@ import {
 import '../styles/Home.css';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-
+import axios from 'axios';
 const Home = () => {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [sortBy, setSortBy] = useState('Featured');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const navigate = useNavigate();
+  const [products, setNewProducts] = useState([]);
+
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      await axios.get('http://localhost:3002/api/products')
+        .then(response => {
+          console.log(response)
+          setNewProducts(response.data);
+        })
+        .catch(error => {
+          console.error("Error fetching products:", error);
+        });
+
+    }
+
+    fetchProducts();
+  }, [products])
 
   function info(product) {
     navigate('/productinfo', { state: { product } });
@@ -40,18 +58,9 @@ const Home = () => {
     setShowFilterMenu(false);
   };
 
-  const products = [
-    { id: 1, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes', description: 'Men\'s Workout Shoes', image: './src/pictures/1.png' },
-    { id: 2, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/2.png' },
-    { id: 3, name: 'Nike Zoom Vomero 5', price: 8895, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/3.png' },
-    { id: 4, name: 'Nike V2K Run', price: 6895, category: 'Women\'s Shoes', description: 'Women\'s Shoes', image: './src/pictures/4.png' },
-    { id: 5, name: 'Nike V2K Run', price: 6895, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/5.png' },
-    { id: 6, name: 'Nike Air Monarch IV', price: 2595, category: 'Men\'s Workout Shoes', description: 'Men\'s Workout Shoes', image: './src/pictures/6.png' },
-    { id: 7, name: 'Nike P-6000', price: 4995, category: 'Shoes', description: 'Shoes', image: './src/pictures/7.png' },
-    { id: 8, name: 'Nike Cortez Leather', price: 4695, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/8.png' },
-    { id: 9, name: 'Nike Waffle Nav', price: 4295, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/9.png' },
-    { id: 10, name: 'Nike Air Pegasus 2005', price: 8395, category: 'Men\'s Shoes', description: 'Men\'s Shoes', image: './src/pictures/10.png' },
-  ];
+
+  // Close menus on outside click
+
 
   // Get unique categories for filter menu
   const categories = useMemo(() => {
@@ -62,8 +71,8 @@ const Home = () => {
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     // First filter by category
-    let filtered = selectedCategory === 'All' 
-      ? products 
+    let filtered = selectedCategory === 'All'
+      ? products
       : products.filter(product => product.category === selectedCategory);
 
     // Then sort the filtered products
@@ -103,7 +112,7 @@ const Home = () => {
               {showFilterMenu && (
                 <div className="dropdown-menu">
                   {categories.map((category) => (
-                    <button 
+                    <button
                       key={category}
                       className="dropdown-item"
                       onClick={() => handleCategorySelect(category)}
@@ -158,7 +167,7 @@ const Home = () => {
 
         <div className="products-grid">
           {filteredAndSortedProducts.map((product) => (
-            <div className="product-card" key={product.id}>
+            <div className="product-card" key={product._id}>
               <div className="product-image-container">
                 <img
                   src={product.image}
