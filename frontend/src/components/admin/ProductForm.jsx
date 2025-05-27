@@ -10,6 +10,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
+  Snackbar,
+  CircularProgress
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
@@ -23,6 +26,8 @@ function ProductForm({ product, onSuccess, onCancel }) {
   const [image, setImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(product?.image || '');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,6 +40,14 @@ function ProductForm({ product, onSuccess, onCancel }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError('Image size should be less than 5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        setError('Please upload an image file');
+        return;
+      }
       setImage(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
@@ -43,6 +56,7 @@ function ProductForm({ product, onSuccess, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       const formDataToSend = new FormData();
@@ -67,15 +81,25 @@ function ProductForm({ product, onSuccess, onCancel }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save product');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save product');
       }
 
+      setSuccessMessage(product ? 'Product updated successfully' : 'Product created successfully');
       onSuccess();
     } catch (error) {
-      console.error('Error saving product:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCloseError = () => {
+    setError('');
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessMessage('');
   };
 
   return (
@@ -178,6 +202,7 @@ function ProductForm({ product, onSuccess, onCancel }) {
                 variant="contained"
                 color="primary"
                 disabled={loading}
+                startIcon={loading && <CircularProgress size={20} />}
               >
                 {loading ? 'Saving...' : 'Save Product'}
               </Button>
@@ -185,6 +210,26 @@ function ProductForm({ product, onSuccess, onCancel }) {
           </Grid>
         </Grid>
       </form>
+
+      <Snackbar 
+        open={!!error} 
+        autoHideDuration={6000} 
+        onClose={handleCloseError}
+      >
+        <Alert onClose={handleCloseError} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar 
+        open={!!successMessage} 
+        autoHideDuration={6000} 
+        onClose={handleCloseSuccess}
+      >
+        <Alert onClose={handleCloseSuccess} severity="success">
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 }

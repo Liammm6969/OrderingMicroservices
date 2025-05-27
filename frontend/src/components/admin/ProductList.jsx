@@ -14,6 +14,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import ProductForm from './ProductForm';
@@ -24,6 +26,8 @@ function ProductList() {
   const [stockDialog, setStockDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [newStock, setNewStock] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchProducts();
@@ -32,41 +36,56 @@ function ProductList() {
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/products');
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
       const data = await response.json();
       setProducts(data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      setError('Error fetching products: ' + error.message);
     }
   };
 
   const handleDelete = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await fetch(`/api/products/${productId}`, {
+        const response = await fetch(`/api/products/${productId}`, {
           method: 'DELETE',
         });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete product');
+        }
+
+        setSuccessMessage('Product deleted successfully');
         fetchProducts();
       } catch (error) {
-        console.error('Error deleting product:', error);
+        setError('Error deleting product: ' + error.message);
       }
     }
   };
 
   const handleStockUpdate = async () => {
     try {
-      await fetch(`/api/products/${selectedProduct._id}/stock`, {
+      const response = await fetch(`/api/products/${selectedProduct._id}/stock`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ stock: parseInt(newStock) }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to update stock');
+      }
+
       setStockDialog(false);
       setSelectedProduct(null);
       setNewStock('');
+      setSuccessMessage('Stock updated successfully');
       fetchProducts();
     } catch (error) {
-      console.error('Error updating stock:', error);
+      setError('Error updating stock: ' + error.message);
     }
   };
 
@@ -74,6 +93,14 @@ function ProductList() {
     setSelectedProduct(product);
     setNewStock(product.stock.toString());
     setStockDialog(true);
+  };
+
+  const handleCloseError = () => {
+    setError('');
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessMessage('');
   };
 
   return (
@@ -84,6 +111,7 @@ function ProductList() {
           onCancel={() => setEditProduct(null)}
           onSuccess={() => {
             setEditProduct(null);
+            setSuccessMessage('Product updated successfully');
             fetchProducts();
           }}
         />
@@ -156,6 +184,26 @@ function ProductList() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar 
+        open={!!error} 
+        autoHideDuration={6000} 
+        onClose={handleCloseError}
+      >
+        <Alert onClose={handleCloseError} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar 
+        open={!!successMessage} 
+        autoHideDuration={6000} 
+        onClose={handleCloseSuccess}
+      >
+        <Alert onClose={handleCloseSuccess} severity="success">
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
