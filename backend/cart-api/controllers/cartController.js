@@ -7,6 +7,7 @@ exports.addToCart = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const result = await cartService.addToCart(userId, productId, quantity);
+    console.log(result)
     res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -20,6 +21,7 @@ exports.getCart = async (req, res) => {
       return res.status(400).json({ error: 'Missing userId parameter' });
     }
     const cart = await cartService.getCart(userId);
+    console.log(`Cart for user ${userId}:`, cart);
     res.status(200).json(cart);
   } catch (error) {
     res.status(400).json({ error: error.message });

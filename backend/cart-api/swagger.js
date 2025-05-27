@@ -9,7 +9,7 @@ const options = {
       description: 'API documentation for Cart Service',
     },
     servers: [
-      { url: 'http://localhost:5003/api' }
+      { url: 'http://localhost:3000/api' }
     ],
   },
   apis: ['./routes/*.js'], // <-- files containing annotations
