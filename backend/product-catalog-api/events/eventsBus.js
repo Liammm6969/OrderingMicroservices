@@ -8,7 +8,9 @@ class EventBus {
 
   async connect() {
     if (!this.connection) {
-      this.connection = await amqp.connect('amqp://localhost');
+      // Use RabbitMQ from docker-compose with correct credentials and updated host port for local development
+      const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://user:password@rabbitmq:5672/';
+      this.connection = await amqp.connect(rabbitUrl);
       this.channel = await this.connection.createChannel();
       console.log('Connected to RabbitMQ');
     }
