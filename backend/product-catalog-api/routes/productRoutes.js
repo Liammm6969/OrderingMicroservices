@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/productController');
+const ProductModel = require('../models/productModel');
+const multer = require('multer');
+const path = require('path');
 
 /**
  * @swagger
@@ -68,7 +71,17 @@ router.get('/:id', controller.getById);
  *       201:
  *         description: Product created
  */
-router.post('/', controller.create);
+// Set up multer storage (store in /uploads, keep original name)
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../uploads'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage });
+router.post('/', upload.single('image'), controller.create);
 /**
  * @swagger
  * /api/products/{id}:
@@ -123,5 +136,21 @@ router.delete('/:id', controller.delete);
  *         description: Product not found
  */
 router.patch('/:id/stock', controller.updateStock);
+
+
+router.post("/addmany", async (req, res) => {
+    try {
+        const products = req.body; // Expecting an array of product objects
+        if (!Array.isArray(products) || products.length === 0) {
+            return res.status(400).json({ message: "Invalid product data" });
+        }
+
+        const createdProducts = await ProductModel.insertMany(products);
+        res.status(201).json(createdProducts);
+    } catch (error) {
+        console.error("Error adding multiple products:", error);
+        res.status(500).json({ message: "Failed to add products", error: error.message });
+    }
+});
 
 module.exports = router;

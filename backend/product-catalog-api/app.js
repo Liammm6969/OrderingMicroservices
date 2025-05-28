@@ -6,6 +6,7 @@ const swaggerSpec = require('./swagger');
 const productRoutes = require('./routes/productRoutes');
 const listenToOrderPlaced = require('./handlers/orderHandler');
 const eventBus = require('./events/eventsBus');
+const path = require('path');
 
 const cors = require('cors');
 
@@ -15,6 +16,7 @@ connectDB();
 app.use(express.json());
 app.use('/api/products', productRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // eventBus.publish('OrderPlaced', { productId: 'abc123', quantity: 1 });
 

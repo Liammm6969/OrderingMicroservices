@@ -17,14 +17,15 @@ async function listenToOrderPlaced() {
     // }
 
     for (const item of event.items) {
+      console.log('Processing item:', item);
       const product = await productService.getProductById(item.productId);
-
+      console.log('Fetched product:', product);
       if (product && product.stock >= item.quantity) {
         const newStock = product.stock - item.quantity;
         await productService.updateStock(item.productId, newStock);
         console.log(`Stock updated for product ${item.productId}: ${newStock}`);
       } else {
-        console.warn(`Insufficient stock for product ${item.productId}`);
+        console.warn(`Insufficient stock for product ${item.productId} or product not found`);
       }
     }
   });

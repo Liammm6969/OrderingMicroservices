@@ -53,13 +53,18 @@ export function CartProvider({ children }) {
     // Send to backend cart-api
     try {
       const userId = localStorage.getItem("userId");
+      // Find the item in the cart to get the right productId
+      const item = cartItems.find(item => (item.id === productId || item.productId === productId || item._id === productId) && item.size === size);
+      const backendProductId = item?.productId || item?.id || item?._id || productId;
+      console.log('Removing from cart:', { userId, backendProductId }); // Debug log
       if (!userId) return;
-      await axios.delete("http://localhost:3000/api/cart", {
+      const response = await axios.delete("http://localhost:3000/api/cart", {
         data: {
           userId,
-          productId
+          productId: backendProductId
         }
       });
+      console.log('Backend remove response:', response.data); // Debug log
     } catch (err) {
       console.error("Failed to remove from cart backend:", err);
     }
