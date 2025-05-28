@@ -31,6 +31,8 @@ exports.getCart = async (req, res) => {
 exports.removeFromCart = async (req, res) => {
   try {
     const { userId, productId } = req.body;
+    console.log(req.body)
+    console.log(`Removing product ${productId} from cart for user ${userId}`);
     if (!userId || !productId) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -50,6 +52,7 @@ exports.checkout = async (req, res) => {
     const order = await cartService.checkout(userId);
     res.status(201).json(order);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Checkout error:', error);
+    res.status(400).json({ error: error.message, stack: error.stack });
   }
 };

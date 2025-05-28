@@ -56,6 +56,25 @@ export default function AddToCart() {
 
   const deliveryTimeMsg = "Expected delivery: 3-5 business days";
 
+  // Vite dynamic import for all images in src/pictures
+  const pictures = import.meta.glob('../pictures/*', { eager: true, as: 'url' });
+
+  const getProductImageUrl = (image) => {
+    if (!image) return '';
+    // If image is a filename (from /src/pictures), use dynamic import
+    const filename = image.split('/').pop();
+    for (const key in pictures) {
+      if (key.endsWith(filename)) {
+        return pictures[key];
+      }
+    }
+    // If image is a backend path
+    if (typeof image === 'string' && image.startsWith('/uploads/')) {
+      return `http://localhost:3002${image}`;
+    }
+    return image;
+  };
+
   return (
     <div className="cart-root">
       <Navbar />
@@ -65,9 +84,9 @@ export default function AddToCart() {
           <div className="cart-items">
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
-                <div key={`${item.id}-${item.size}`} className="cart-item-row">
+                <div key={`${item._id}-${item.size}`} className="cart-item-row">
                   <img
-                    src={item.image}
+                    src={getProductImageUrl(item.image)}
                     alt={item.name}
                     className="cart-item-image"
                   />

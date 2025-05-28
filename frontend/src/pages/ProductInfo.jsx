@@ -45,6 +45,25 @@ export default function ProductInfo() {
     setSelectedSize(size);
   };
 
+  // Vite dynamic import for all images in src/pictures
+  const pictures = import.meta.glob('../pictures/*', { eager: true, as: 'url' });
+
+  const getProductImageUrl = (image) => {
+    if (!image) return '';
+    // If image is a filename (from /src/pictures), use dynamic import
+    const filename = image.split('/').pop();
+    for (const key in pictures) {
+      if (key.endsWith(filename)) {
+        return pictures[key];
+      }
+    }
+    // If image is a backend path
+    if (typeof image === 'string' && image.startsWith('/uploads/')) {
+      return `http://localhost:3002${image}`;
+    }
+    return image;
+  };
+
   return (
     <div className="info-container">
       <Navbar />
@@ -85,7 +104,7 @@ export default function ProductInfo() {
 
           <div className="img-container">
             <img
-              src={product.image}
+              src={getProductImageUrl(product.image)}
               alt={product.name}
               className="info-image"
             />

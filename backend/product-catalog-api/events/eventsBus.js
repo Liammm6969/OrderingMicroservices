@@ -8,9 +8,7 @@ class EventBus {
 
   async connect() {
     if (!this.connection) {
-      // Use rabbitmq as hostname in Docker, localhost otherwise
-      const url = `amqp://guest:guest@localhost:5672/`;
-      this.connection = await amqp.connect(url);
+      this.connection = await amqp.connect('amqp://localhost');
       this.channel = await this.connection.createChannel();
       console.log('Connected to RabbitMQ');
     }

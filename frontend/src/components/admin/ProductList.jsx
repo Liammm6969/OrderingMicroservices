@@ -20,6 +20,9 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import ProductForm from './ProductForm';
 
+// Vite dynamic import for all images in src/pictures
+const pictures = import.meta.glob('../../pictures/*', { eager: true, as: 'url' });
+
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [editProduct, setEditProduct] = useState(null);
@@ -35,7 +38,7 @@ function ProductList() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
+      const response = await fetch('http://localhost:3002/api/products');
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -49,10 +52,10 @@ function ProductList() {
   const handleDelete = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const response = await fetch(`/api/products/${productId}`, {
+        const response = await fetch(`http://localhost:3002/api/products/${productId}`, {
           method: 'DELETE',
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to delete product');
         }
@@ -67,7 +70,7 @@ function ProductList() {
 
   const handleStockUpdate = async () => {
     try {
-      const response = await fetch(`/api/products/${selectedProduct._id}/stock`, {
+      const response = await fetch(`http://localhost:3002/api/products/${selectedProduct._id}/stock`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -103,6 +106,22 @@ function ProductList() {
     setSuccessMessage('');
   };
 
+  const getProductImageUrl = (image) => {
+    if (!image) return '';
+    // If image is a filename (from /src/pictures), use dynamic import
+    const filename = image.split('/').pop();
+    for (const key in pictures) {
+      if (key.endsWith(filename)) {
+        return pictures[key];
+      }
+    }
+    // If image is a backend path
+    if (typeof image === 'string' && image.startsWith('/uploads/')) {
+      return `http://localhost:3002${image}`;
+    }
+    return image;
+  };
+
   return (
     <div>
       {editProduct ? (
@@ -133,7 +152,7 @@ function ProductList() {
                 <TableRow key={product._id}>
                   <TableCell>
                     <img
-                      src={product.image}
+                      src={getProductImageUrl(product.image)}
                       alt={product.name}
                       style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                     />
@@ -185,9 +204,9 @@ function ProductList() {
         </DialogActions>
       </Dialog>
 
-      <Snackbar 
-        open={!!error} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
         onClose={handleCloseError}
       >
         <Alert onClose={handleCloseError} severity="error">
@@ -195,9 +214,9 @@ function ProductList() {
         </Alert>
       </Snackbar>
 
-      <Snackbar 
-        open={!!successMessage} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
         onClose={handleCloseSuccess}
       >
         <Alert onClose={handleCloseSuccess} severity="success">
@@ -208,4 +227,4 @@ function ProductList() {
   );
 }
 
-export default ProductList; 
+export default ProductList;

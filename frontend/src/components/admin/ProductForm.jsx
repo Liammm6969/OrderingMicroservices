@@ -15,7 +15,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-
+import axios from 'axios';
 function ProductForm({ product, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
     name: product?.name || '',
@@ -64,31 +64,50 @@ function ProductForm({ product, onSuccess, onCancel }) {
       formDataToSend.append('price', formData.price);
       formDataToSend.append('category', formData.category);
       formDataToSend.append('stock', formData.stock);
-      
+
       if (image) {
         formDataToSend.append('image', image);
+      } else if (product && product.image) {
+        formDataToSend.append('image', product.image);
+      }
+      console.log('Form Data:', formDataToSend);
+
+      // Debug: log all form data entries
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0] + ':', pair[1]);
       }
 
       const url = product
-        ? `/api/products/${product._id}`
-        : '/api/products';
-      
-      const method = product ? 'PUT' : 'POST';
+        ? `http://localhost:3002/api/products/${product._id}`
+        : 'http://localhost:3002/api/products';
 
-      const response = await fetch(url, {
+      const method = product ? 'put' : 'post';
+
+      await axios({
         method,
-        body: formDataToSend,
+        url,
+        data: formDataToSend,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save product');
-      }
-
       setSuccessMessage(product ? 'Product updated successfully' : 'Product created successfully');
+      setFormData({
+        name: '',
+        price: '',
+        category: '',
+        stock: 0,
+      });
+      setImage(null);
+      setPreviewUrl('');
       onSuccess();
     } catch (error) {
-      setError(error.message);
+      setError(
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to save product'
+      );
     } finally {
       setLoading(false);
     }
@@ -211,9 +230,9 @@ function ProductForm({ product, onSuccess, onCancel }) {
         </Grid>
       </form>
 
-      <Snackbar 
-        open={!!error} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
         onClose={handleCloseError}
       >
         <Alert onClose={handleCloseError} severity="error">
@@ -221,9 +240,9 @@ function ProductForm({ product, onSuccess, onCancel }) {
         </Alert>
       </Snackbar>
 
-      <Snackbar 
-        open={!!successMessage} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
         onClose={handleCloseSuccess}
       >
         <Alert onClose={handleCloseSuccess} severity="success">
@@ -234,4 +253,4 @@ function ProductForm({ product, onSuccess, onCancel }) {
   );
 }
 
-export default ProductForm; 
+export default ProductForm;

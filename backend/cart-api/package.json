@@ -1,7 +1,7 @@
 {
   "name": "cart-api",
   "version": "1.0.0",
-  "description": "Cart Service API with Redis and Product Validation",
+  "description": "Cart Service API with Product Validation",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
